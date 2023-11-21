@@ -1,0 +1,177 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Course {
+    private final String courseCode;
+    private final String title;
+    private final String description;
+    private final int capacity;
+    private final String schedule;
+    private int availableSlots;
+
+    public Course(String courseCode, String title, String description, int capacity, String schedule) {
+        this.courseCode = courseCode;
+        this.title = title;
+        this.description = description;
+        this.capacity = capacity;
+        this.schedule = schedule;
+        this.availableSlots = capacity;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getAvailableSlots() {
+        return availableSlots;
+    }
+
+    public String getSchedule() {
+        return schedule;
+    }
+
+    public boolean registerStudent() {
+        if (availableSlots > 0) {
+            availableSlots--;
+            return true;
+        }
+        return false;
+    }
+
+    public void removeStudent() {
+        if (availableSlots < capacity) {
+            availableSlots++;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Course: " + courseCode + " - " + title + "\nDescription: " + description + "\nSchedule: " + schedule
+                + "\nAvailable Slots: " + availableSlots + "/" + capacity + "\n";
+    }
+}
+
+class Student {
+    private final int studentID;
+    private final String name;
+    private final List<Course> registeredCourses;
+
+    public Student(int studentID, String name) {
+        this.studentID = studentID;
+        this.name = name;
+        this.registeredCourses = new ArrayList<>();
+    }
+
+    public int getStudentID() {
+        return studentID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Course> getRegisteredCourses() {
+        return registeredCourses;
+    }
+
+    public void registerCourse(Course course) {
+        if (course.registerStudent()) {
+            registeredCourses.add(course);
+            System.out.println(name + " registered for course: " + course.getTitle());
+        } else {
+            System.out.println("Sorry, " + course.getTitle() + " is full.");
+        }
+    }
+
+    public void dropCourse(Course course) {
+        if (registeredCourses.contains(course)) {
+            registeredCourses.remove(course);
+            course.removeStudent();
+            System.out.println(name + " dropped course: " + course.getTitle());
+        } else {
+            System.out.println(name + " is not registered for " + course.getTitle());
+        }
+    }
+
+    public void displayRegisteredCourses() {
+        System.out.println(name + "'s Registered Courses:");
+        for (Course course : registeredCourses) {
+            System.out.println(course.getTitle());
+        }
+        System.out.println();
+    }
+}
+
+class CourseManagementSystem {
+    private final List<Course> courses;
+    private final List<Student> students;
+
+    public CourseManagementSystem() {
+        courses = new ArrayList<>();
+        students = new ArrayList<>();
+    }
+
+    public void addCourse(Course course) {
+        courses.add(course);
+    }
+
+    public void registerStudent(Student student) {
+        students.add(student);
+    }
+
+    public void displayAvailableCourses() {
+        System.out.println("Available Courses:");
+        for (Course course : courses) {
+            System.out.println(course);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        CourseManagementSystem courseSystem = new CourseManagementSystem();
+
+        // Creating courses
+        Course c1 = new Course("CSE101", "Introduction to Computer Science", "Introductory course to CS", 50, "Mon/Wed/Fri 9:00 AM");
+        Course c2 = new Course("MAT201", "Calculus", "Fundamentals of calculus", 40, "Tue/Thu 11:00 AM");
+
+        courseSystem.addCourse(c1);
+        courseSystem.addCourse(c2);
+
+        // Creating students
+        Student s1 = new Student(1001, "Alice");
+        Student s2 = new Student(1002, "Bob");
+
+        courseSystem.registerStudent(s1);
+        courseSystem.registerStudent(s2);
+
+        // Display available courses
+        courseSystem.displayAvailableCourses();
+
+        // Registering students for courses
+        s1.registerCourse(c1);
+        s2.registerCourse(c1);
+
+        s1.registerCourse(c2);
+
+        // Displaying registered courses for students
+        s1.displayRegisteredCourses();
+        s2.displayRegisteredCourses();
+
+        // Dropping courses for students
+        s1.dropCourse(c1);
+        s2.dropCourse(c1);
+
+        // Displaying registered courses after dropping
+        s1.displayRegisteredCourses();
+        s2.displayRegisteredCourses();
+    }
+}
